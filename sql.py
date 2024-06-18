@@ -9,7 +9,7 @@ def run_sql(
     username = 'postgres',
     password = 'postgres'
     ):
-
+#
     import psycopg2 as PostgreAdapter
     import psycopg2.extras
     import pandas as pd

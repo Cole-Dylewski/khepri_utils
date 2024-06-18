@@ -611,19 +611,49 @@ def merge_requirements(source, newFile):
     sourceReqs = {}
     with open(source, 'r') as f:
         lines = f.readlines()
-        sourceReqs = {line.strip().split('==')[0]: "==".join(line.strip().split('==')[1:]) for line in lines}
-    
+        for line in lines:
+            if line.strip():
+                qualifier = False
+                if ';' in line:
+                    qualifier = line.strip().split(';')[-1]
+                    module = line.strip().split('==')[0].split(';')[0]
+                else:
+                    module = line.strip().split('==')[0]
+                sourceReqs[module] = qualifier
+        # sourceReqs = {line.strip().split('==')[0]: "==".join(line.strip().split('==')[1:]) for line in lines}
+    # print(sourceReqs)
+    # for k, v in sourceReqs.items():
+    #     print(k,v)
+        
     updatedReqs = {}
     with open(newFile, 'r') as f:
         lines = f.readlines()
-        updatedReqs = {line.strip().split('==')[0]: "==".join(line.strip().split('==')[1:]) for line in lines}
-    
-    for k,v in updatedReqs.items():
-        if k not in sourceReqs.keys() and k not in ['psycopg','psycopg-binary'] :
-            print(k,v)
+        for line in lines:
+            if line.strip():
+                qualifier = False
+                if ';' in line:
+                    qualifier = line.strip().split(';')[-1]
+                    # print(line.strip().split('=='), line.strip().split(';')[-1], qualifier)
+
+                    module = line.strip().split(';')[0].split('==')[0]
+                else:
+                    module = line.strip().split('==')[0]
+                updatedReqs[module] = qualifier
+    # print(updatedReqs)
+    # print('-'*50)
+    for k, v in updatedReqs.items():
+        if k not in sourceReqs.keys():
             sourceReqs[k] = v
-            
+            # print(k,v)
+    # print(sourceReqs)
+    lines = []
+    for k, v in sourceReqs.items():
+        # print('-'*5)
+        # print(k,v)   
+        if v:
+            lines.append(f'{k};{v}\n')
+        else:
+            lines.append(f'{k}\n')
+    # print(lines)
     with open(source,'w') as f:
-        for k,v in sourceReqs.items():
-            line = f'{k}=={v}\n'
-            f.write(line)
+        f.writelines(lines)
