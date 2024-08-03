@@ -5,7 +5,7 @@ import uuid
 import ipaddress
 import pandas as pd
 
-from khepri_utils import basic
+from khepri_utils.common import basic
 
 django_model_field_desc = {
     'AutoField': 'An integer field that automatically increments.',

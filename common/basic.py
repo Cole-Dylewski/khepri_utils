@@ -1,11 +1,10 @@
 import pandas as pd
 import numpy as np
-import uuid, json, ipaddress, uuid
+import uuid, json, ipaddress
 import os
 import datetime as dt
 from decimal import Decimal
 
-from khepri_utils import aws_s3
 #TEST 
 # %% Random Functions
 #generates a UUID string
@@ -409,7 +408,7 @@ def build_rand_df(randRange = 100, colNum = 10, rowNum = 100, columns = [], absN
         return pd.DataFrame(np.random.uniform(startRange, randRange, size=(rowNum, colNum)), columns=columns)
 
 # %% Cryptography
-def gen_rsa_keys(key_size = 2048, format = 'pem', save_location = False, bucket = '', s3FolderPath = '', region_name = ""):
+def gen_rsa_keys(key_size = 2048, format = 'pem', save_location = False):
     import boto3
     #standard secret name: 'rsaKeys'
     # GENERATES KEYS AND SAVES TO SECRET AND S3
@@ -470,17 +469,14 @@ def gen_rsa_keys(key_size = 2048, format = 'pem', save_location = False, bucket 
             public_key_file.close()
             
         if isinstance(save_location, str):
-            if save_location.lower() == 's3':
-               aws_s3.send_to_s3(data = private_key, bucket = bucket, s3FileName = f"{s3FolderPath}/private_key.pem")
-               aws_s3.send_to_s3(data = public_key, bucket = bucket, s3FileName = f"{s3FolderPath}/public_key.pem")
-            else:
-                private_key_file = open(f"{save_location}/private_key.pem", "w")
-                private_key_file.write(private_key)
-                private_key_file.close()
-                
-                public_key_file = open(f"{save_location}/public_key.txt", "w")
-                public_key_file.write(public_key)
-                public_key_file.close()
+            
+            private_key_file = open(f"{save_location}/private_key.pem", "w")
+            private_key_file.write(private_key)
+            private_key_file.close()
+            
+            public_key_file = open(f"{save_location}/public_key.txt", "w")
+            public_key_file.write(public_key)
+            public_key_file.close()
     
     return keys
 
@@ -657,3 +653,38 @@ def merge_requirements(source, newFile):
     # print(lines)
     with open(source,'w') as f:
         f.writelines(lines)
+        
+def print_nested_obj(data, indent=0):
+    if indent == 0:
+        print("{")
+
+    for key, value in data.items():
+        # Print key with appropriate indentation
+        # print(key,value, type(value))
+        print('\t' * indent + '"' + str(key) + '":', end=' ')
+        
+        if isinstance(value, dict):
+            # If value is a dictionary, recursively call print_nested_python_dict
+            print('{')
+            print_nested_obj(value, indent + 1)
+            print('\t' * indent + '},')
+        elif isinstance(value, list):
+            # If value is a list, print each element with indentation
+            print('[')
+            for item in value:
+                if isinstance(item, (dict, list)):
+                    print_nested_obj(item, indent + 1)
+                else:
+                    print('\t' * (indent + 1) + '"'+ item + '"' + ",")
+            print('\t' * indent + '],')
+
+        elif isinstance(value, type(None)):
+            print(str(value)+",")
+        else:
+            # Check if value is boolean and print accordingly
+            if isinstance(value, bool) or str(value).lower() in ['true', 'false']:
+                print(str(value).capitalize() + ",")
+            else:
+                print('"'+str(value) + '"'+",")
+    if indent == 0:
+        print("}")

@@ -3,7 +3,8 @@ import pandas as pd
 import math, os
 from io import StringIO
 
-from khepri_utils import basic, sql
+from khepri_utils import sql
+from khepri_utils.common import basic
 
 s3_client = boto3.client('s3')
 s3_resource = boto3.resource('s3')
