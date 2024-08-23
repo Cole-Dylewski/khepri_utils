@@ -4,8 +4,10 @@ import pandas as pd
 from datetime import datetime
 import time
 
-from khepri_utils.alpaca.api import accounts, assets, orders, portfolio, watchlists, calendar, clock, crypto  # Adjust import as necessary
+#  accounts, assets, orders, portfolio, watchlists, calendar, clock, crypto  # Adjust import as necessary00
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+from khepri_utils.alpaca.api import accounts, assets, orders, portfolio, watchlists, calendar, clock, crypto, history, data
 
 class TraderClient:
     def __init__(self, api_key, api_secret, base_url=r'https://paper-api.alpaca.markets', api_version='v2', premium=False, printVerbose=False):
@@ -16,187 +18,320 @@ class TraderClient:
         self.premium = premium
         self.printVerbose = printVerbose
 
+    # Account related methods
     def get_account(self):
-        """Retrieve account information."""
-        return accounts.get_account(self.api_key, self.api_secret, self.base_url, self.api_version)
+        try:
+            return accounts.get_account(self.api_key, self.api_secret, self.base_url, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
     def get_account_configurations(self):
-        """Retrieve account configurations."""
-        return accounts.get_account_configurations(self.api_key, self.api_secret, self.base_url, self.api_version)
+        try:
+            return accounts.get_account_configurations(self.api_key, self.api_secret, self.base_url, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def update_account_configurations(self, **configurations):
-        """Update account configurations."""
-        return accounts.update_account_configurations(self.api_key, self.api_secret, self.base_url, self.api_version, **configurations)
+    def get_account_activities(self):
+        try:
+            return accounts.get_account_activities(self.api_key, self.api_secret, self.base_url, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def get_account_activities(self, activity_type=None, date=None, until=None, after=None, direction=None, page_size=None, page_token=None):
-        """Retrieve account activities."""
-        return accounts.get_account_activities(self.api_key, self.api_secret, self.base_url, self.api_version, activity_type, date, until, after, direction, page_size, page_token)
+    # Asset related methods
+    def get_assets(self, status='active'):
+        try:
+            return assets.get_assets(self.api_key, self.api_secret, self.base_url, self.api_version, status)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def list_assets(self, status='active', asset_class='us_equity'):
-        """List assets based on status and asset class."""
-        return assets.list_assets(self.api_key, self.api_secret, self.base_url, self.api_version, status, asset_class)
-    
-    def get_asset(self, asset_id_or_symbol):
-        """Retrieve information about a specific asset."""
-        return assets.get_asset(self.api_key, self.api_secret, self.base_url, self.api_version, asset_id_or_symbol)
-    
-    def submit_order(self, symbol, qty, side, order_type, time_in_force, limit_price=None, stop_price=None, client_order_id=None):
-        """Submit an order."""
-        return orders.submit_order(self.api_key, self.api_secret, self.base_url, self.api_version, symbol, qty, side, order_type, time_in_force, limit_price, stop_price, client_order_id)
-    
-    def list_orders(self, status='open', limit=50, after=None, until=None, direction='desc'):
-        """List orders with optional filters."""
-        return orders.list_orders(self.api_key, self.api_secret, self.base_url, self.api_version, status, limit, after, until, direction)
-    
+    # Order related methods
+    def submit_order(self, symbol, qty, side, order_type, time_in_force):
+        try:
+            return orders.submit_order(self.api_key, self.api_secret, self.api_version, symbol, qty, side, order_type, time_in_force)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
     def get_order(self, order_id):
-        """Retrieve details about a specific order."""
-        return orders.get_order(self.api_key, self.api_secret, self.base_url, self.api_version, order_id)
-    
-    def replace_order(self, order_id, qty=None, limit_price=None, stop_price=None, time_in_force=None):
-        """Replace an existing order."""
-        return orders.replace_order(self.api_key, self.api_secret, self.base_url, self.api_version, order_id, qty, limit_price, stop_price, time_in_force)
-    
-    def cancel_order(self, order_id):
-        """Cancel a specific order."""
-        return orders.cancel_order(self.api_key, self.api_secret, self.base_url, self.api_version, order_id)
-    
-    def get_positions(self):
-        """Retrieve the list of positions in the portfolio."""
-        return portfolio.get_positions(self.api_key, self.api_secret, self.base_url, self.api_version)
-    
-    def get_portfolio_history(self, period=None, timeframe=None, date_end=None, extended_hours=False):
-        """Retrieve portfolio history."""
-        return portfolio.get_portfolio_history(self.api_key, self.api_secret, self.base_url, self.api_version, period, timeframe, date_end, extended_hours)
+        try:
+            return orders.get_order(self.api_key, self.api_secret, self.api_version, order_id)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def create_watchlist(self, name, symbols):
-        """Create a new watchlist."""
-        return watchlists.create_watchlist(self.api_key, self.api_secret, self.base_url, self.api_version, name, symbols)
+    def list_orders(self):
+        try:
+            return orders.list_orders(self.api_key, self.api_secret, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def cancel_order(self, order_id):
+        try:
+            return orders.cancel_order(self.api_key, self.api_secret, self.api_version, order_id)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    # Portfolio related methods
+    def get_positions(self):
+        try:
+            return portfolio.get_positions(self.api_key, self.api_secret, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def get_account_summary(self):
+        try:
+            return portfolio.get_account_summary(self.api_key, self.api_secret, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    # Watchlist related methods
+    def get_watchlists(self):
+        try:
+            return watchlists.get_watchlists(self.api_key, self.api_secret, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
     def get_watchlist(self, watchlist_id):
-        """Retrieve a specific watchlist."""
-        return watchlists.get_watchlist(self.api_key, self.api_secret, self.base_url, self.api_version, watchlist_id)
-    
-    def update_watchlist(self, watchlist_id, symbols):
-        """Update an existing watchlist."""
-        return watchlists.update_watchlist(self.api_key, self.api_secret, self.base_url, self.api_version, watchlist_id, symbols)
-    
+        try:
+            return watchlists.get_watchlist(self.api_key, self.api_secret, self.api_version, watchlist_id)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def create_watchlist(self, name, symbols):
+        try:
+            return watchlists.create_watchlist(self.api_key, self.api_secret, self.api_version, name, symbols)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def update_watchlist(self, watchlist_id, name, symbols):
+        try:
+            return watchlists.update_watchlist(self.api_key, self.api_secret, self.api_version, watchlist_id, name, symbols)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
     def delete_watchlist(self, watchlist_id):
-        """Delete a specific watchlist."""
-        return watchlists.delete_watchlist(self.api_key, self.api_secret, self.base_url, self.api_version, watchlist_id)
+        try:
+            return watchlists.delete_watchlist(self.api_key, self.api_secret, self.api_version, watchlist_id)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def get_calendar(self, start=None, end=None):
-        """Retrieve market calendar events."""
-        return calendar.get_calendar(self.api_key, self.api_secret, self.base_url, self.api_version, start, end)
-    
+    # Calendar related methods
+    def get_calendar(self, start, end=''):
+        try:
+            return calendar.get_calendar(self.api_key, self.api_secret, self.api_version, start, end)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    # Clock related methods
     def get_clock(self):
-        """Retrieve market clock information."""
-        return clock.get_clock(self.api_key, self.api_secret, self.base_url, self.api_version)
+        try:
+            return clock.get_clock(self.api_key, self.api_secret, self.api_version)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def list_crypto_assets(self, status='active', asset_class='crypto'):
-        """List cryptocurrency assets."""
-        return crypto.list_crypto_assets(self.api_key, self.api_secret, self.base_url, self.api_version, status, asset_class)
+    # Crypto related methods
+    def get_crypto_bars(self, symbols, timeframe, start, end='', limit=1000, adjustment='raw', feed='sip', page_token=''):
+        try:
+            return crypto.get_crypto_data(self.api_key, self.api_secret, self.api_version, symbols, timeframe, start, end, limit, adjustment, feed, page_token)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def submit_crypto_order(self, symbol, qty, side, order_type, time_in_force, limit_price=None, stop_price=None, client_order_id=None):
-        """Submit a cryptocurrency order."""
-        return crypto.submit_crypto_order(self.api_key, self.api_secret, self.base_url, self.api_version, symbol, qty, side, order_type, time_in_force, limit_price, stop_price, client_order_id)
+    def get_crypto_funding(self, symbol, start, end='', limit=1000):
+        try:
+            return crypto.get_crypto_funding(self.api_key, self.api_secret, self.api_version, symbol, start, end, limit)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def get_funding_account(self, asset_class='crypto'):
-        """Retrieve the funding account information for crypto."""
-        return crypto.get_funding_account(self.api_key, self.api_secret, self.base_url, self.api_version, asset_class)
+    # History related methods
+    def get_barset(self, symbols, timeframe, start, end='', limit=1000, adjustment='raw', feed=False, page_token=''):
+        try:
+            return history.get_barset(self, symbols, timeframe, start, end, limit, adjustment, feed, page_token)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def create_funding_account(self, crypto_address):
-        """Create a funding account for crypto."""
-        return crypto.create_funding_account(self.api_key, self.api_secret, self.base_url, self.api_version, crypto_address)
+    # Data related methods
+    def get_stock_data(self, symbol, timeframe, start, end='', limit=1000, adjustment='raw', feed=False):
+        try:
+            return data.stocks.get_stock_data(self.api_key, self.api_secret, self.api_version, symbol, timeframe, start, end, limit, adjustment, feed)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def get_funding_history(self):
-        """Retrieve funding history for crypto."""
-        return crypto.get_funding_history(self.api_key, self.api_secret, self.base_url, self.api_version)
+    def get_crypto_data(self, symbol, timeframe, start, end='', limit=1000, adjustment='raw', feed=False):
+        try:
+            return data.crypto.get_crypto_data(self.api_key, self.api_secret, self.api_version, symbol, timeframe, start, end, limit, adjustment, feed)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-    def transfer_funds(self, amount, currency, direction, crypto_address=None):
-        """Transfer funds to/from a cryptocurrency account."""
-        return crypto.transfer_funds(self.api_key, self.api_secret, self.base_url, self.api_version, amount, currency, direction, crypto_address)
+    def get_forex_data(self, symbol, timeframe, start, end='', limit=1000, adjustment='raw', feed=False):
+        try:
+            return data.forex.get_forex_data(self.api_key, self.api_secret, self.api_version, symbol, timeframe, start, end, limit, adjustment, feed)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
 
-# Example usage:
+    def get_logo(self, symbol):
+        try:
+            return data.logos.get_logo(self.api_key, self.api_secret, self.api_version, symbol)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def get_screener_data(self, filter, limit=100):
+        try:
+            return data.screener.get_screener_data(self.api_key, self.api_secret, self.api_version, filter, limit)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def get_news(self, symbol, start, end='', limit=100):
+        try:
+            return data.news.get_news(self.api_key, self.api_secret, self.api_version, symbol, start, end, limit)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def get_corporate_actions(self, symbol, start, end='', limit=100):
+        try:
+            return data.corporate_actions.get_corporate_actions(self.api_key, self.api_secret, self.api_version, symbol, start, end, limit)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    def get_options_data(self, symbol, expiration_date, strike_price, call_put, limit=100):
+        try:
+            return data.options.get_options_data(self.api_key, self.api_secret, self.api_version, symbol, expiration_date, strike_price, call_put, limit)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+            
+def main():
+    # Replace these with your actual Alpaca API credentials
+    API_KEY = 'your_api_key'
+    API_SECRET = 'your_api_secret'
+    BASE_URL = 'https://paper-api.alpaca.markets'  # or the live URL for live trading
+    API_VERSION = 'v2'
+
+    # Initialize the Alpaca client
+    client = TraderClient(API_KEY, API_SECRET, BASE_URL, API_VERSION)
+
+    # Example usage of various methods
+
+    # Get account details
+    try:
+        account_info = client.get_account()
+        print("Account Info:", account_info)
+    except Exception as e:
+        print(f"Failed to get account info: {e}")
+
+    # Get account configurations
+    try:
+        account_configurations = client.get_account_configurations()
+        print("Account Configurations:", account_configurations)
+    except Exception as e:
+        print(f"Failed to get account configurations: {e}")
+
+    # Get account activities
+    try:
+        account_activities = client.get_account_activities()
+        print("Account Activities:", account_activities)
+    except Exception as e:
+        print(f"Failed to get account activities: {e}")
+
+    # Get assets
+    try:
+        active_assets = client.get_assets(status='active')
+        print("Active Assets:", active_assets)
+    except Exception as e:
+        print(f"Failed to get assets: {e}")
+
+    # Submit an order
+    try:
+        order = client.submit_order(
+            symbol='AAPL',
+            qty=1,
+            side='buy',
+            order_type='market',
+            time_in_force='gtc'
+        )
+        print("Order Submitted:", order)
+    except Exception as e:
+        print(f"Failed to submit order: {e}")
+
+    # Get positions
+    try:
+        positions = client.get_positions()
+        print("Positions:", positions)
+    except Exception as e:
+        print(f"Failed to get positions: {e}")
+
+    # Manage watchlists
+    try:
+        watchlists = client.get_watchlists()
+        print("Watchlists:", watchlists)
+    except Exception as e:
+        print(f"Failed to get watchlists: {e}")
+
+    # Example of creating a watchlist
+    try:
+        new_watchlist = client.create_watchlist(name="My Watchlist", symbols=["AAPL", "TSLA"])
+        print("New Watchlist Created:", new_watchlist)
+    except Exception as e:
+        print(f"Failed to create watchlist: {e}")
+
+    # Get calendar events
+    try:
+        calendar_events = client.get_calendar(start='2023-01-01', end='2023-01-31')
+        print("Calendar Events:", calendar_events)
+    except Exception as e:
+        print(f"Failed to get calendar events: {e}")
+
+    # Get clock information
+    try:
+        clock_info = client.get_clock()
+        print("Market Clock:", clock_info)
+    except Exception as e:
+        print(f"Failed to get clock info: {e}")
+
+    # Get stock data
+    try:
+        stock_data = client.get_stock_data(symbol='AAPL', timeframe='day', start='2023-01-01', end='2023-01-31')
+        print("Stock Data:", stock_data)
+    except Exception as e:
+        print(f"Failed to get stock data: {e}")
+
+    # Get crypto data
+    try:
+        crypto_data = client.get_crypto_data(symbol='BTCUSD', timeframe='day', start='2023-01-01', end='2023-01-31')
+        print("Crypto Data:", crypto_data)
+    except Exception as e:
+        print(f"Failed to get crypto data: {e}")
+
+    # Get forex data
+    try:
+        forex_data = client.get_forex_data(symbol='EURUSD', timeframe='day', start='2023-01-01', end='2023-01-31')
+        print("Forex Data:", forex_data)
+    except Exception as e:
+        print(f"Failed to get forex data: {e}")
+
+    # Get company logo
+    try:
+        logo = client.get_logo(symbol='AAPL')
+        print("Company Logo URL:", logo)
+    except Exception as e:
+        print(f"Failed to get company logo: {e}")
+
+    # Get news
+    try:
+        news = client.get_news(symbol='AAPL', start='2023-01-01', end='2023-01-31')
+        print("News:", news)
+    except Exception as e:
+        print(f"Failed to get news: {e}")
+
+    # Get corporate actions
+    try:
+        corporate_actions = client.get_corporate_actions(symbol='AAPL', start='2023-01-01', end='2023-01-31')
+        print("Corporate Actions:", corporate_actions)
+    except Exception as e:
+        print(f"Failed to get corporate actions: {e}")
+
+    # Get options data
+    try:
+        options_data = client.get_options_data(symbol='AAPL', expiration_date='2023-08-16', strike_price=150, call_put='call')
+        print("Options Data:", options_data)
+    except Exception as e:
+        print(f"Failed to get options data: {e}")
+
 if __name__ == "__main__":
-    client = AlpacaClient('your_api_key', 'your_api_secret')
-    
-    # Example operations
-    account_info = client.get_account()
-    print("Account Info:", account_info)
-
-    account_configs = client.get_account_configurations()
-    print("Account Configurations:", account_configs)
-
-    updated_configs = client.update_account_configurations(
-        dtbp_check='both',
-        trade_confirm_email='none',
-        suspend_trade=False,
-        no_shorting=False
-    )
-    print("Updated Account Configurations:", updated_configs)
-
-    account_activities = client.get_account_activities()
-    print("Account Activities:", account_activities)
-    
-    assets_list = client.list_assets()
-    print("Assets List:", assets_list)
-    
-    asset_info = client.get_asset('AAPL')
-    print("Asset Info:", asset_info)
-    
-    order = client.submit_order('AAPL', 1, 'buy', 'market', 'gtc')
-    print("Order Submitted:", order)
-    
-    orders_list = client.list_orders()
-    print("Orders List:", orders_list)
-    
-    order_info = client.get_order(order['id'])
-    print("Order Info:", order_info)
-    
-    replaced_order = client.replace_order(order['id'], qty=2)
-    print("Order Replaced:", replaced_order)
-    
-    cancelled_order = client.cancel_order(order['id'])
-    print("Order Cancelled:", cancelled_order)
-    
-    positions = client.get_positions()
-    print("Positions:", positions)
-    
-    portfolio_history = client.get_portfolio_history()
-    print("Portfolio History:", portfolio_history)
-    
-    watchlist = client.create_watchlist('Tech Stocks', ['AAPL', 'GOOGL'])
-    print("Watchlist Created:", watchlist)
-    
-    watchlist_info = client.get_watchlist(watchlist['id'])
-    print("Watchlist Info:", watchlist_info)
-    
-    updated_watchlist = client.update_watchlist(watchlist['id'], ['AAPL', 'AMZN'])
-    print("Watchlist Updated:", updated_watchlist)
-    
-    deleted_watchlist = client.delete_watchlist(watchlist['id'])
-    print("Watchlist Deleted:", deleted_watchlist)
-    
-    calendar_events = client.get_calendar()
-    print("Calendar Events:", calendar_events)
-    
-    market_clock = client.get_clock()
-    print("Market Clock:", market_clock)
-    
-    crypto_assets = client.list_crypto_assets()
-    print("Crypto Assets:", crypto_assets)
-    
-    crypto_order = client.submit_crypto_order('BTCUSD', 0.1, 'buy', 'limit', 'gtc', limit_price=30000)
-    print("Crypto Order Submitted:", crypto_order)
-    
-    funding_account = client.get_funding_account()
-    print("Funding Account:", funding_account)
-    
-    create_funding = client.create_funding_account('your_crypto_address')
-    print("Funding Account Created:", create_funding)
-    
-    funding_history = client.get_funding_history()
-    print("Funding History:", funding_history)
-    
-    transfer = client.transfer_funds(100, 'USD', 'deposit', 'your_crypto_address')
-    print("Funds Transferred:", transfer)
+    main()
