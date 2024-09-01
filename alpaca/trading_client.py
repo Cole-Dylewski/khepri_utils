@@ -7,7 +7,7 @@ import time
 #  accounts, assets, orders, portfolio, watchlists, calendar, clock, crypto  # Adjust import as necessary00
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-from khepri_utils.alpaca.api import accounts, assets, orders, portfolio, watchlists, calendar, clock, crypto, history, data
+from khepri_utils.alpaca.trader_api import accounts, assets, orders, portfolio, watchlists, calendar, clock, crypto, history, data
 
 class TraderClient:
     def __init__(self, api_key, api_secret, base_url=r'https://paper-api.alpaca.markets', api_version='v2', premium=False, printVerbose=False):
